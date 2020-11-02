@@ -271,11 +271,24 @@ inline bitblock<nbits>& convert_to_bb(bool _sign, int _scale, const bitblock<fbi
 	// interpolation rule checks
 	if (check_inward_projection_range<nbits, es>(_scale)) {    // regime dominated
 		if (_trace_conversion) std::cout << "inward projection" << std::endl;
-		// we are projecting to minpos/maxpos
-		int k = calculate_unconstrained_k<nbits, es>(_scale);
-		ptt = k < 0 ? minpos_pattern<nbits, es>(_sign) : maxpos_pattern<nbits, es>(_sign);
-		// we are done
-		if (_trace_rounding) std::cout << "projection  rounding ";
+
+		// UNDERFLOW
+		bool underflow = false;
+#if defined(UNDERFLOW_MODE) && UNDERFLOW_MODE>0
+		if(_scale < 0) {
+			int scale_minpos = -(static_cast<int>(nbits) - 2) * (1 << es);
+			underflow = (_scale < scale_minpos - UNDERFLOW_MODE);
+		}
+#endif
+
+		if(!underflow) {
+			// we are projecting to minpos/maxpos
+			int k = calculate_unconstrained_k<nbits, es>(_scale);
+			ptt = k < 0 ? minpos_pattern<nbits, es>(_sign) : maxpos_pattern<nbits, es>(_sign);
+			// we are done
+			if (_trace_rounding) std::cout << "projection  rounding ";
+		}
+		// else, p is already cleared
 	}
 	else {
 		const size_t pt_len = nbits + 3 + es;
@@ -342,11 +355,24 @@ inline posit<nbits, es>& convert_(bool _sign, int _scale, const bitblock<fbits>&
 	// interpolation rule checks
 	if (check_inward_projection_range<nbits, es>(_scale)) {    // regime dominated
 		if (_trace_conversion) std::cout << "inward projection" << std::endl;
-		// we are projecting to minpos/maxpos
-		int k = calculate_unconstrained_k<nbits, es>(_scale);
-		k < 0 ? p.set(minpos_pattern<nbits, es>(_sign)) : p.set(maxpos_pattern<nbits, es>(_sign));
-		// we are done
-		if (_trace_rounding) std::cout << "projection  rounding ";
+
+		// UNDERFLOW
+		bool underflow = false;
+#if defined(UNDERFLOW_MODE) && UNDERFLOW_MODE>0
+		if(_scale < 0) {
+			int scale_minpos = -(static_cast<int>(nbits) - 2) * (1 << es);
+			underflow = (_scale < scale_minpos - UNDERFLOW_MODE);
+		}
+#endif
+
+		if(!underflow) {
+			// we are projecting to minpos/maxpos
+			int k = calculate_unconstrained_k<nbits, es>(_scale);
+			k < 0 ? p.set(minpos_pattern<nbits, es>(_sign)) : p.set(maxpos_pattern<nbits, es>(_sign));
+			// we are done
+			if (_trace_rounding) std::cout << "projection  rounding ";
+		}
+		// else, p is already cleared
 	}
 	else {
 		constexpr size_t pt_len = nbits + 3 + es;
