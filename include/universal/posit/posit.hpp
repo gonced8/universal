@@ -274,10 +274,15 @@ inline bitblock<nbits>& convert_to_bb(bool _sign, int _scale, const bitblock<fbi
 
 		// UNDERFLOW
 		bool underflow = false;
-#if defined(UNDERFLOW_MODE) && UNDERFLOW_MODE>0
+#if defined(UNDERFLOW_MODE) && UNDERFLOW_MODE!=0
 		if(_scale < 0) {
+#if UNDERFLOW_MODE==-1
+			int scale_limit = -(static_cast<int>(nbits) - 1) * (1 << es);
+			underflow = ((_scale < scale_limit) || (_scale == scale_limit && fraction_in.none()));
+#else
 			int scale_minpos = -(static_cast<int>(nbits) - 2) * (1 << es);
 			underflow = (_scale < scale_minpos - UNDERFLOW_MODE);
+#endif
 		}
 #endif
 
@@ -358,10 +363,15 @@ inline posit<nbits, es>& convert_(bool _sign, int _scale, const bitblock<fbits>&
 
 		// UNDERFLOW
 		bool underflow = false;
-#if defined(UNDERFLOW_MODE) && UNDERFLOW_MODE>0
+#if defined(UNDERFLOW_MODE) && UNDERFLOW_MODE!=0
 		if(_scale < 0) {
+#if UNDERFLOW_MODE==-1
+			int scale_limit = -(static_cast<int>(nbits) - 1) * (1 << es);
+			underflow = ((_scale < scale_limit) || (_scale == scale_limit && fraction_in.none()));
+#else
 			int scale_minpos = -(static_cast<int>(nbits) - 2) * (1 << es);
 			underflow = (_scale < scale_minpos - UNDERFLOW_MODE);
+#endif
 		}
 #endif
 
