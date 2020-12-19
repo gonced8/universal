@@ -1,3 +1,5 @@
+EDIT: Posits are extended to support underflow.
+
 # Universal: a header-only C++ template library for universal number arithmetic
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/25452f0319d34bc2a553cd1857d7dfae)](https://app.codacy.com/gh/stillwater-sc/universal?utm_source=github.com&utm_medium=referral&utm_content=stillwater-sc/universal&utm_campaign=Badge_Grade_Dashboard)
